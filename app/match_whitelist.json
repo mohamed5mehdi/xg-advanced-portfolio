@@ -1,0 +1,36 @@
+{
+  "matches": [
+    {
+      "match_id": 266310,
+      "label": "Haut de classement — La Liga 2015/16 (Barcelona 8-0 RC Deportivo La Coruña, 20/04/2016)",
+      "competition_id": 11,
+      "season_id": 27,
+      "context": "training_corpus",
+      "status": "CONFIRMED"
+    },
+    {
+      "match_id": 3754214,
+      "label": "Bas de classement — Premier League 2015/16 (Aston Villa 0-6 Liverpool, 14/02/2016)",
+      "competition_id": 2,
+      "season_id": 27,
+      "context": "training_corpus",
+      "status": "CONFIRMED"
+    },
+    {
+      "match_id": 3901184,
+      "label": "Milieu de tableau — Ligue 1 2015/16 (Olympique de Marseille 2-5 Rennes, 18/03/2016)",
+      "competition_id": 7,
+      "season_id": 27,
+      "context": "training_corpus",
+      "status": "CONFIRMED"
+    },
+    {
+      "match_id": 18243,
+      "label": "Finale Champions League 2015/16 — Real Madrid vs Atlético Madrid",
+      "competition_id": 16,
+      "season_id": 27,
+      "context": "out_of_distribution_showcase",
+      "status": "CONFIRMED"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+Naive: LogLoss=0.3199992570041586, Brier=0.0881431933442926
+Logistic: AUC=0.7938486379250389, LogLoss=0.269354004799483, Brier=0.07405259323775039
+XGBoost: AUC=0.7993945654190249, LogLoss=0.2585505590043777, Brier=0.07304838298618951
+StatsBomb: AUC=0.8040526434770057, LogLoss=0.2567431561193153, Brier=0.07191351962446409
+
+Best XGBoost Params: {'n_estimators': 88, 'max_depth': 4, 'learning_rate': 0.08179098161551973, 'subsample': 0.9784215249232682, 'colsample_bytree': 0.8079231305616865, 'random_state': 42, 'eval_metric': 'logloss'}
+
+Top 10 SHAP Features:
+  angle: 0.556241512298584
+  gk_distance: 0.4434606730937958
+  defenders_in_cone: 0.23138807713985443
+  shot_body_part_Right Foot: 0.19850939512252808
+  distance: 0.13148000836372375
+  shot_body_part_Left Foot: 0.12412342429161072
+  shot_technique_Normal: 0.10748416930437088
+  gk_angle: 0.08339697122573853
+  under_pressure: 0.068831667304039
+  play_pattern_From Free Kick: 0.055803488940000534

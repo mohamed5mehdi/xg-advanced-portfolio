@@ -1,0 +1,11 @@
+statsbombpy
+pandas
+numpy
+scikit-learn
+xgboost
+optuna
+shap
+matplotlib
+seaborn
+jupyter
+pyarrow

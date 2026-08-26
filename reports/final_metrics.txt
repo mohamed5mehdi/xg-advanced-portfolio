@@ -1,0 +1,18 @@
+Naive: LogLoss=0.3199992570041586, Brier=0.0881431933442926
+Logistic: AUC=0.7945278710760306, LogLoss=0.26164439356457236, Brier=0.0738407420676186
+XGBoost: AUC=0.8023904235134263, LogLoss=0.25749968201580475, Brier=0.07277470040454474
+StatsBomb: AUC=0.8040526434770057, LogLoss=0.2567431561193153, Brier=0.07191351962446409
+
+Best XGBoost Params: {'n_estimators': 138, 'max_depth': 3, 'learning_rate': 0.06784848062577233, 'subsample': 0.7882960342255022, 'colsample_bytree': 0.9950963787861274, 'random_state': 42, 'eval_metric': 'logloss'}
+
+Top 10 SHAP Features:
+  angle: 0.6202662587165833
+  gk_distance: 0.44904953241348267
+  defenders_in_cone: 0.21374276280403137
+  shot_body_part_Right Foot: 0.13547742366790771
+  pass_height_High Pass: 0.11489943414926529
+  distance: 0.09809127449989319
+  shot_body_part_Left Foot: 0.07791522145271301
+  gk_angle: 0.07726270705461502
+  under_pressure: 0.06675335764884949
+  pass_technique_Through Ball: 0.06391512602567673
