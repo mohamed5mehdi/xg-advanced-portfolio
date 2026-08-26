@@ -1,0 +1,43 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Données brutes StatsBomb (volumineuses, régénérables via data_collection.py) ---
+data/raw/
+data/interim/
+
+# --- Données intermédiaires volumineuses ---
+# Décommente la ligne suivante si data/processed/*.parquet dépasse ~50-100 Mo
+# (limite souple/dure de GitHub). Sinon, garde-les versionnés pour la reproductibilité.
+# data/processed/*.parquet
+
+# --- Optuna ---
+*.db
+optuna_studies/
+
+# --- Modèles (les .joblib calibrés font quelques Mo, versionnables sans souci) ---
+# models/*.joblib   # décommente seulement si le fichier dépasse la limite GitHub
+
+# --- Environnement / secrets ---
+.env
+.env.*
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- IDE ---
+.vscode/
+.idea/
+
+# --- Logs ---
+*.log
