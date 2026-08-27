@@ -245,3 +245,129 @@ def add_tactical_inset(*args, **kwargs):
     le freeze_frame du tir concerné. Hors scope de cette phase — à scoper séparément.
     """
     raise NotImplementedError("add_tactical_inset : nécessite jointure vers data/raw/ (scope confirmé, non implémenté ici).")
+
+
+def _assign_pitch_sides(shots_df, team_col="team"):
+    """
+    Assigne un côté d'affichage (gauche/droite) à chaque équipe du match.
+
+    LIMITE DE DONNÉES : aucun flag home/away n'existe dans le schéma confirmé.
+    Le côté gauche/droite est une CONVENTION D'AFFICHAGE (ordre alphabétique),
+    pas une donnée factuelle domicile/extérieur — à mentionner dans toute légende.
+    """
+    teams = sorted(shots_df[team_col].dropna().unique())
+    if len(teams) != 2:
+        raise ValueError(f"Attendu exactement 2 équipes, trouvé {len(teams)} : {teams}")
+    return teams[0], teams[1]  # team_left, team_right
+
+
+def _mirror_shots_for_side(shots_df, side, x_col="x", pitch_length=120):
+    """
+    Retourne une copie du dataframe avec x inversé (x' = 120 - x) si side == "left".
+
+    RAPPEL MÉTHODOLOGIQUE : les coordonnées sont normalisées par sens d'attaque
+    PROPRE À CHAQUE ÉQUIPE (rapport du 22/08, vérifié sur Sporting Gijón,
+    match 3825739 : x moyen quasi identique period=1 vs period=2). Résultat :
+    toutes les équipes pointent par défaut vers x=120. Cette fonction inverse
+    uniquement l'AFFICHAGE de l'équipe assignée "gauche" — aucune donnée
+    sous-jacente n'est modifiée, seule une copie locale l'est.
+    """
+    df = shots_df.copy()
+    if side == "left":
+        df[x_col] = pitch_length - df[x_col]
+    return df
+
+
+def generate_opta_style_match_report(
+    shots_df,
+    match_id,
+    xg_col="model_xg",
+    x_col="x", y_col="y",
+    save_path=None,
+    face_color="#1a1a1a",   # inchangé, comme demandé
+    line_color="white",     # inchangé, comme demandé
+    header_color="#0d0d0d",
+):
+    """
+    Rapport de match façon Opta : terrain unique avec les deux équipes en
+    miroir gauche/droite, bandeau d'en-tête, comparatif de stats central.
+
+    LIMITES DOCUMENTÉES (ne pas contourner) :
+    - Côté gauche/droite = convention alphabétique, pas domicile/extérieur.
+    - Pas de possession — absente du schéma, jamais affichée.
+    - "Tirs cadrés" affiché SEULEMENT si shot_outcome contient bien les
+      catégories 'Goal'/'Saved' après vérification réelle — sinon omis.
+    - Statut toujours "FULL TIME" : données 2015/16 déjà terminées, jamais du direct.
+    """
+    match_shots = shots_df[shots_df["match_id"] == match_id].copy()
+    if match_shots.empty:
+        raise ValueError(f"Aucun tir trouvé pour match_id={match_id}")
+
+    team_left, team_right = _assign_pitch_sides(match_shots)
+
+    left_raw = match_shots[match_shots["team"] == team_left]
+    right_raw = match_shots[match_shots["team"] == team_right]
+    left_mirrored = _mirror_shots_for_side(left_raw, "left", x_col)
+    display_shots = pd.concat([left_mirrored, right_raw], ignore_index=True)
+
+    def _team_stats(team_df):
+        stats = {
+            "goals": int(team_df["is_goal"].sum()),
+            "xg": team_df[xg_col].sum(),
+            "shots": len(team_df),
+        }
+        if "shot_outcome" in team_df.columns:
+            known_on_target = {"Goal", "Saved", "Saved to Post"}
+            present = set(team_df["shot_outcome"].dropna().unique())
+            if known_on_target & present:
+                stats["on_target"] = int(team_df["shot_outcome"].isin(known_on_target).sum())
+        return stats
+
+    stats_l, stats_r = _team_stats(left_raw), _team_stats(right_raw)
+
+    fig = plt.figure(figsize=(13, 10), facecolor=header_color)
+    gs = fig.add_gridspec(3, 1, height_ratios=[1.1, 0.9, 5.5], hspace=0.05)
+    ax_header, ax_stats, ax_pitch = (fig.add_subplot(gs[i]) for i in range(3))
+
+    for ax in (ax_header, ax_stats):
+        ax.set_facecolor(header_color)
+        ax.axis("off")
+
+    ax_header.text(0.02, 0.6, team_left, color="white", fontsize=20, fontweight="bold", ha="left", va="center")
+    ax_header.text(0.5, 0.6, f"{stats_l['goals']} - {stats_r['goals']}", color="white",
+                    fontsize=28, fontweight="bold", ha="center", va="center")
+    ax_header.text(0.98, 0.6, team_right, color="white", fontsize=20, fontweight="bold", ha="right", va="center")
+    ax_header.text(0.5, 0.1, f"Match {match_id} — FULL TIME", color="#999999", fontsize=11, ha="center", va="center")
+
+    rows = [("xG", stats_l["xg"], stats_r["xg"], ".2f"), ("Tirs", stats_l["shots"], stats_r["shots"], "d")]
+    if "on_target" in stats_l and "on_target" in stats_r:
+        rows.append(("Cadrés", stats_l["on_target"], stats_r["on_target"], "d"))
+
+    for i, (label, val_l, val_r, fmt) in enumerate(rows):
+        y = 1 - (i + 0.5) / len(rows)
+        total = (val_l + val_r) or 1
+        frac_l = val_l / total
+        ax_stats.barh(y, frac_l, left=0, height=0.35, color="#5dade2")
+        ax_stats.barh(y, 1 - frac_l, left=frac_l, height=0.35, color="#e74c3c")
+        ax_stats.text(0.02, y, f"{val_l:{fmt}}", color="white", fontsize=11, fontweight="bold", va="center", ha="left")
+        ax_stats.text(0.98, y, f"{val_r:{fmt}}", color="white", fontsize=11, fontweight="bold", va="center", ha="right")
+        ax_stats.text(0.5, y, label, color="#cccccc", fontsize=10, va="center", ha="center")
+    ax_stats.set_xlim(0, 1); ax_stats.set_ylim(0, 1)
+
+    draw_statsbomb_pitch(ax_pitch, line_color=line_color, face_color=face_color)
+    ax_pitch, cf, excluded = draw_xg_weighted_heatmap(
+        display_shots, ax=ax_pitch, xg_col=xg_col,
+        face_color=face_color, line_color=line_color, show_pitch=False,
+    )
+    if excluded > 0:
+        import logging
+        logging.warning(f"generate_opta_style_match_report(match_id={match_id}) : {excluded} tirs exclus (hors bornes)")
+
+    ax_pitch.text(0.02, -0.03, f"{team_left} — xG {stats_l['xg']:.2f}", transform=ax_pitch.transAxes,
+                  color="white", fontsize=11, ha="left")
+    ax_pitch.text(0.98, -0.03, f"{team_right} — xG {stats_r['xg']:.2f}", transform=ax_pitch.transAxes,
+                  color="white", fontsize=11, ha="right")
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight", facecolor=header_color)
+    return fig, (ax_header, ax_stats, ax_pitch)
