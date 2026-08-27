@@ -168,3 +168,80 @@ def generate_match_heatmap(df_match_shots, match_id, output_path=None, title=Non
         return output_path, excluded
     
     return fig, excluded
+
+
+def plot_shot_map(
+    shots_df,
+    mode="all",
+    ax=None,
+    xg_col="model_xg",
+    title=None,
+    annotate_summary=True,
+    save_path=None,
+    face_color="#1a1a1a",
+    line_color="white",
+):
+    """
+    mode="all"   -> délègue à draw_xg_weighted_heatmap() (fonction existante,
+                    déjà validée sur les 4 matchs MVP) : heatmap KDE pondérée
+                    + nuage de tirs (non-buts cercle, buts étoile).
+    mode="goals" -> terrain nu (draw_statsbomb_pitch) + uniquement les buts,
+                    avec annotation textuelle par but (joueur, minute, xG).
+    """
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(12, 8), facecolor=face_color)
+    else:
+        fig = ax.get_figure()
+
+    if mode == "all":
+        ax, cf, excluded = draw_xg_weighted_heatmap(
+            shots_df, ax=ax, xg_col=xg_col,
+            face_color=face_color, line_color=line_color,
+        )
+        if excluded > 0:
+            import logging
+            logging.warning(f"plot_shot_map(mode='all') : {excluded} tirs exclus (hors bornes terrain)")
+
+    elif mode == "goals":
+        draw_statsbomb_pitch(ax, line_color=line_color, face_color=face_color)
+        goals = shots_df[shots_df["is_goal"] == 1].copy()
+        ax.scatter(goals["x"], goals["y"], marker="*", s=320, color="#f1c40f",
+                   edgecolor="#e74c3c", linewidth=1.4, zorder=6)
+        for _, row in goals.iterrows():
+            xg_val = row[xg_col] if xg_col in row and pd.notna(row[xg_col]) else float("nan")
+            label = f"{row.get('player', '?')} {int(row['minute'])}' (xG={xg_val:.2f})"
+            ax.annotate(label, (row["x"], row["y"]), color="white", fontsize=8,
+                        xytext=(6, 6), textcoords="offset points",
+                        bbox=dict(boxstyle="round,pad=0.2", fc="#1a1a1a", ec="#f1c40f", alpha=0.85))
+    else:
+        raise ValueError(f"mode inconnu : {mode!r} (attendu 'all' ou 'goals')")
+
+    if annotate_summary:
+        add_summary_textbox(ax, shots_df, xg_col=xg_col)
+    if title:
+        ax.set_title(title, color="white", fontweight="bold", fontsize=14)
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight", facecolor=face_color)
+    return fig, ax
+
+
+def add_summary_textbox(ax, shots_df, xg_col="model_xg"):
+    total_xg = shots_df[xg_col].sum() if xg_col in shots_df.columns else 0.0
+    total_goals = shots_df["is_goal"].sum() if "is_goal" in shots_df.columns else 0
+    n_shots = len(shots_df)
+    text = f"Tirs : {n_shots}   |   xG cumulé : {total_xg:.2f}   |   Buts réels : {int(total_goals)}"
+    ax.text(0.5, -0.06, text, transform=ax.transAxes, ha="center", color="white",
+            fontsize=10, bbox=dict(boxstyle="round,pad=0.3", fc="#1a1a1a", ec="#444444"))
+
+
+def add_tactical_inset(*args, **kwargs):
+    """
+    NON IMPLÉMENTÉ dans cette phase — scope confirmé par l'audit 4.0, pas bloqué.
+    Le freeze_frame brut (positions x,y, teammate) EXISTE dans data/raw/*.parquet
+    (colonne shot_freeze_frame), mais N'EST PAS conservé dans all_shots_scored.parquet.
+    Implémentation nécessite : jointure match_id + identifiant du tir vers le
+    fichier raw correspondant (train/comp{N}_season27.parquet selon competition_id,
+    ou raw/showcase/comp16_match18243.parquet pour le showcase) pour récupérer
+    le freeze_frame du tir concerné. Hors scope de cette phase — à scoper séparément.
+    """
+    raise NotImplementedError("add_tactical_inset : nécessite jointure vers data/raw/ (scope confirmé, non implémenté ici).")
