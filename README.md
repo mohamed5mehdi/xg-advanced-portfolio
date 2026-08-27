@@ -1,4 +1,4 @@
-﻿# xg-advanced-portfolio
+# xg-advanced-portfolio
 
 A calibrated Expected Goals (xG) model built on StatsBomb open data — designed to be
 **honest about its scope**, not to artificially beat a professional benchmark.
@@ -10,8 +10,8 @@ A calibrated Expected Goals (xG) model built on StatsBomb open data — designed
 - **Model**: XGBoost, Optuna-tuned (15 trials, log-loss objective, `GroupKFold(3)` on
   `match_id`), `max_depth` deliberately capped at 2–4 for explainability, then
   isotonic-calibrated (`CalibratedClassifierCV`, `GroupKFold(5)` on `match_id`).
-- **Result**: **AUC 0.8007** on the Ligue 1 holdout vs. StatsBomb's own benchmark of
-  **0.8041** — a gap of ~0.0033, left **deliberately unclosed**. The goal here isn't to
+- **Result**: **AUC 0.8024** on the Ligue 1 holdout vs. StatsBomb's own benchmark of
+  **0.8041** — a gap of ~0.0017, left **deliberately unclosed**. The goal here isn't to
   beat a professional reference; it's to build a model that's honest about what it
   knows and doesn't know.
 
@@ -46,8 +46,9 @@ open-data file is under-collected (34 matches, ~13MB, one club only).
 - `gk_distance` / `gk_angle` / `gk_found`: goalkeeper freeze-frame features — **NaN
   when no freeze frame exists**, real values when the keeper is identified, and a
   documented fallback (goal-center coordinates) for the rare case where a freeze frame
-  exists but the keeper isn't identified (32 / 37,488 shots, 0.085% — open decision:
-  keep vs. correct to NaN + retrain).
+  exists but the keeper isn't identified. **Update**: this fallback was corrected to
+  honest NaN and the model retrained — measured effect: +0.00167 AUC
+  (0.80072 → 0.80239), cutting the benchmark gap roughly in half (0.0033 → 0.0017).
 
 **Methodological transparency note**: one-hot encoding (`pd.get_dummies`,
 `drop_first=True`) is fit on train+test concatenated, then re-split. This guarantees no
