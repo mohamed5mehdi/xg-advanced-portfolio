@@ -236,15 +236,12 @@ def add_summary_textbox(ax, shots_df, xg_col="model_xg"):
 
 def add_tactical_inset(*args, **kwargs):
     """
-    NON IMPLÉMENTÉ dans cette phase — scope confirmé par l'audit 4.0, pas bloqué.
-    Le freeze_frame brut (positions x,y, teammate) EXISTE dans data/raw/*.parquet
-    (colonne shot_freeze_frame), mais N'EST PAS conservé dans all_shots_scored.parquet.
-    Implémentation nécessite : jointure match_id + identifiant du tir vers le
-    fichier raw correspondant (train/comp{N}_season27.parquet selon competition_id,
-    ou raw/showcase/comp16_match18243.parquet pour le showcase) pour récupérer
-    le freeze_frame du tir concerné. Hors scope de cette phase — à scoper séparément.
+    Non implémenté : nécessite les positions x,y brutes du freeze frame (gardien et
+    défenseurs), qui existent dans data/raw/*.parquet (colonne shot_freeze_frame) mais
+    ne sont pas conservées dans all_shots_scored.parquet. Implémentation possible via
+    une jointure match_id + identifiant du tir vers le fichier raw correspondant.
     """
-    raise NotImplementedError("add_tactical_inset : nécessite jointure vers data/raw/ (scope confirmé, non implémenté ici).")
+    raise NotImplementedError("add_tactical_inset : nécessite une jointure vers data/raw/ (non implémenté).")
 
 
 def _assign_pitch_sides(shots_df, team_col="team"):
@@ -318,6 +315,8 @@ def generate_opta_style_match_report(
         }
         if "shot_outcome" in team_df.columns:
             known_on_target = {"Goal", "Saved", "Saved to Post"}
+            # 'Saved Off Target' volontairement exclue du comptage "cadré" : incohérente
+            # avec la définition retenue ici pour un tir sur cible.
             present = set(team_df["shot_outcome"].dropna().unique())
             if known_on_target & present:
                 stats["on_target"] = int(team_df["shot_outcome"].isin(known_on_target).sum())

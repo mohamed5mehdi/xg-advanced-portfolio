@@ -1,4 +1,4 @@
-﻿"""
+"""
 Indicateurs métier avancés — xg-advanced-portfolio.
 
 Architecture défensive : chaque fonction valide la présence des colonnes
@@ -6,7 +6,7 @@ attendues et lève une erreur explicite plutôt que de produire un résultat
 silencieusement faux (principe déjà appliqué ailleurs dans le pipeline :
 NaN honnête > valeur fabriquée).
 
-Colonnes réelles utilisées (confirmées par le rapport exhaustif, Phases 1 & 3) :
+Colonnes réelles utilisées :
 match_id, team, player, minute, x, y, is_goal, under_pressure, model_xg
 """
 from __future__ import annotations
@@ -39,7 +39,7 @@ def compute_team_xg_against(
     """
     xG concédé (proxy pré-tir) par équipe, vs buts réellement encaissés.
 
-    ATTENTION MÉTHODOLOGIQUE — À RESPECTER DANS TOUTE PRÉSENTATION :
+    Note méthodologique :
     Ceci N'EST PAS un PSxG-GA au sens StatsBomb/FBref. Un vrai PSxG nécessite
     un modèle post-shot entraîné sur shot.end_location, donnée absente des
     23 colonnes documentées de features.py. Notre modèle est pré-shot.

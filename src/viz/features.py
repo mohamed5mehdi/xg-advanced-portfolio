@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def calculate_distance(x, y, goal_x=120, goal_y=40):
     return np.sqrt((x - goal_x)**2 + (y - goal_y)**2)
 
-def calculate_angle(x, y, goal_x=120, goal_width=7.32):
+def calculate_angle(x, y, goal_x=120):
     # Goal posts are at (120, 36) and (120, 44)
     post1_y = 36
     post2_y = 44
@@ -101,9 +101,9 @@ def extract_freeze_frame_features(freeze_frame, shot_x, shot_y):
             cos_angle = np.clip(dot / (mag_goal * mag_gk), -1.0, 1.0)
             gk_angle = np.degrees(np.arccos(cos_angle))
     else:
-        # CORRECTIF (decision actee) : freeze_frame present mais gardien non detecte -> NaN honnete
-        # plutot que le repli fabrique (120,40). Concerne 32/37488 tirs (0.0854%). XGBoost gere
-        # nativement les NaN (deja le cas pour les tirs sans freeze_frame du tout).
+        # Freeze frame present mais gardien non detecte -> NaN honnete plutot qu'un repli
+        # fabrique sur (120,40). Concerne 32/37488 tirs (0.0854%). XGBoost gere nativement
+        # les NaN (deja le cas pour les tirs sans freeze_frame du tout).
         gk_dist = np.nan
         gk_angle = np.nan
 
@@ -172,12 +172,12 @@ def process_events(df):
             f_dict = {
                 'match_id': row['match_id'],
                 'competition_id': row['competition_id'],
-                'team': row.get('team'),              # AJOUT Phase 3
-                'player': row.get('player'),          # AJOUT Phase 3
-                'minute': row.get('minute'),          # AJOUT Phase 3
-                'x': shot_x,                          # AJOUT Phase 3
-                'y': shot_y,                          # AJOUT Phase 3
-                'shot_outcome': row.get('shot_outcome'),  # AJOUT Phase 3
+                'team': row.get('team'),              # métadonnée
+                'player': row.get('player'),          # métadonnée
+                'minute': row.get('minute'),          # métadonnée
+                'x': shot_x,                          # métadonnée
+                'y': shot_y,                          # métadonnée
+                'shot_outcome': row.get('shot_outcome'),  # métadonnée
                 'distance': dist,
                 'angle': angle,
                 'defenders_in_cone': def_in_cone,

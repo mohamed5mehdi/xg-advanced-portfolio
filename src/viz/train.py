@@ -31,7 +31,7 @@ def load_and_prep_data():
     target = 'is_goal'
     cols_to_drop = [
         'match_id', 'competition_id', 'is_goal', 'statsbomb_xg', 'gk_found',
-        'team', 'player', 'minute', 'x', 'y', 'shot_outcome',  # métadonnées Phase 3 — jamais des features
+        'team', 'player', 'minute', 'x', 'y', 'shot_outcome',  # métadonnées — jamais des features
     ]
     
     cat_cols = ['shot_technique', 'play_pattern', 'pass_technique', 'pass_height', 'pass_type', 'shot_body_part']

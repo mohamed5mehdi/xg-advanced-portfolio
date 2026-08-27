@@ -30,9 +30,8 @@ def draw_statsbomb_pitch(ax, line_color="white", face_color="#1a1a1a"):
         pen_x = gx + direction * 12
         ax.plot(pen_x, PITCH_WIDTH / 2, marker="o", color=line_color, markersize=2, zorder=5)
         half_angle_deg = np.degrees(np.arccos(6 / 10))
-        # CORRECTIF (audit du 2026-08-21) : l'arc doit bulger vers l'exterieur de la surface,
-        # donc vers +x (theta~0) pour le but gauche (direction=1), et vers -x (theta~180)
-        # pour le but droit (direction=-1) -- inverse de la version precedente non committée.
+        # L'arc doit bulger vers l'exterieur de la surface : +x (theta~0) pour le but
+        # gauche (direction=1), -x (theta~180) pour le but droit (direction=-1).
         if direction == 1:
             theta1, theta2 = -half_angle_deg, half_angle_deg
         else:
