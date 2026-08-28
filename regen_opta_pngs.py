@@ -1,5 +1,5 @@
 """
-Régénère les 4 PNG opta_style_<match_id>.png dans reports/
+Régénère les 4 PNG opta_style_<match_id>.png dans reports/figures/
 en utilisant generate_opta_style_match_report() (avec le fix "Saved to Post").
 Affiche les valeurs "Cadrés" par équipe pour chaque match.
 """
@@ -30,10 +30,10 @@ MATCHES = {
     18243:   "Real Madrid vs Atl. Madrid — Finale C1 2015/16",
 }
 
-os.makedirs("reports", exist_ok=True)
+os.makedirs("reports/figures", exist_ok=True)
 
 for mid, label in MATCHES.items():
-    save_path = f"reports/opta_style_{mid}.png"
+    save_path = f"reports/figures/opta_style_{mid}.png"
     print(f"\n{'='*60}")
     print(f"Match {mid} — {label}")
 
