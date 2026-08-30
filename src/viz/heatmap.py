@@ -89,7 +89,14 @@ def draw_xg_weighted_heatmap(
         try:
             # Vérifier variance minimale pour éviter matrice de covariance singulière
             if np.var(x) > 1e-4 and np.var(y) > 1e-4:
-                kde = gaussian_kde(np.vstack([x, y]), weights=weights, bw_method=bw_method)
+                # Sous-échantillonnage représentatif pour fluidité si volume très élevé (>2500 tirs)
+                if len(x) > 2500:
+                    idx = np.random.RandomState(42).choice(len(x), size=2500, replace=False)
+                    kde_x, kde_y, kde_w = x[idx], y[idx], weights[idx]
+                else:
+                    kde_x, kde_y, kde_w = x, y, weights
+
+                kde = gaussian_kde(np.vstack([kde_x, kde_y]), weights=kde_w, bw_method=bw_method)
                 
                 # Grille régulière bornée au terrain
                 xi = np.linspace(0, PITCH_LENGTH, grid_size)
