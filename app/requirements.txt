@@ -5,3 +5,4 @@ pyarrow
 numpy
 scipy
 scikit-learn
+matplotlib==3.11.1
