@@ -4,6 +4,8 @@ A calibrated Expected Goals (xG) model built on StatsBomb open data — designed
 **honest about its scope**, not to artificially beat a professional benchmark.
 Results are explored in a five-page Streamlit dashboard.
 
+**▶ Live demo: [xg-advanced.streamlit.app](https://xg-advanced.streamlit.app)**
+
 ![Python](https://img.shields.io/badge/Python-3-3776AB) ![XGBoost](https://img.shields.io/badge/XGBoost-calibrated-orange) ![Streamlit](https://img.shields.io/badge/Streamlit-dashboard-FF4B4B)
 
 ## TL;DR
@@ -88,6 +90,8 @@ vocabulary. Common, defensible, disclosed here rather than hidden.
 - **No minutes-played data**: shot volume can't currently be normalized per-90.
 
 ## Dashboard
+
+Available online at **https://xg-advanced.streamlit.app** (the app may take a few seconds to wake up).
 
 | Page | What it shows |
 |---|---|
