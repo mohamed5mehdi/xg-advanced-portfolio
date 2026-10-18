@@ -1,7 +1,10 @@
-# xg-advanced-portfolio
+# Expected Goals (xG) — calibrated model & Streamlit dashboard
 
 A calibrated Expected Goals (xG) model built on StatsBomb open data — designed to be
 **honest about its scope**, not to artificially beat a professional benchmark.
+Results are explored in a five-page Streamlit dashboard.
+
+![Python](https://img.shields.io/badge/Python-3-3776AB) ![XGBoost](https://img.shields.io/badge/XGBoost-calibrated-orange) ![Streamlit](https://img.shields.io/badge/Streamlit-dashboard-FF4B4B)
 
 ## TL;DR
 
@@ -84,23 +87,48 @@ vocabulary. Common, defensible, disclosed here rather than hidden.
   identity from raw freeze-frame data.
 - **No minutes-played data**: shot volume can't currently be normalized per-90.
 
-## Reproducing this
+## Dashboard
 
-```powershell
-python src/data_collection.py
-python src/features.py
-python src/train.py
-python score_all_matches.py
+| Page | What it shows |
+|---|---|
+| Shot Explorer | Shot maps and Opta-style match reports |
+| Goalkeeper xG Against | Team-level xG faced vs. goals conceded |
+| Scouting Quadrant | Shot volume vs. average shot quality, split by pressure |
+| Delta xG | Goals − cumulative xG, to flag over/under-performing finishers |
+| Model Evaluation | ROC, precision-recall, calibration curve and SHAP importances |
+
+Run it locally:
+
+```bash
+pip install -r app/requirements.txt
+streamlit run app/streamlit_app.py
 ```
 
-## Roadmap
+## Reproducing the model
 
-- Phase 4: Streamlit dashboard MVP (`match_whitelist.json` as source of truth).
-- Phase 5: document the shot-coordinate attack-direction normalization mechanism
-  (confirmed empirically, not yet located in source) and the goalkeeper-fallback
-  decision.
+Run from the repository root:
+
+```bash
+pip install -r requirements.txt
+python src/viz/data_collection.py   # StatsBomb open data → data/raw/
+python src/viz/features.py          # feature engineering → data/processed/
+python src/viz/train.py             # Optuna + XGBoost + calibration → models/, reports/
+python scripts/score_all_matches.py # scores every shot for the dashboard
+```
+
+## Project structure
+
+```
+app/               Streamlit dashboard (entry point + 5 pages)
+src/viz/           data collection, feature engineering, training, pitch & heatmap plots
+src/analytics/     advanced metrics used by the dashboard
+scripts/           maintenance scripts (re-scoring, refit, figure regeneration)
+models/            calibrated model artifact
+reports/           final metrics, test predictions, figures; history/ keeps pre-fix metrics
+data/processed/    engineered features and scored shots
+```
 
 ## Author
 
-Mohamed Mehdi El Jadoui — software engineer, aspiring data scientist in football
-analytics.
+**Mohamed Mehdi El Jadaoui** — software engineer, data science & football analytics
+[LinkedIn](https://www.linkedin.com/in/mehdi-el-jadaoui-2a7755407) · [GitHub](https://github.com/mohamed5mehdi)

@@ -22,7 +22,7 @@ from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score, log_loss, brier_score_loss
 
 # Résolution des chemins
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 if str(PROJECT_ROOT / "src") not in sys.path:

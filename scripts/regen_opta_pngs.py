@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 
-sys.path.insert(0, str(Path(__file__).parent / "src" / "viz"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src" / "viz"))
 from heatmap import generate_opta_style_match_report
 
 SHOTS_PATH = Path("data/processed/all_shots_scored.parquet")
