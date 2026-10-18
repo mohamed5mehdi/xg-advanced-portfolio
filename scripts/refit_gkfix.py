@@ -17,7 +17,7 @@ from xgboost import XGBClassifier
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Import load_and_prep_data from src/viz/train.py
-sys.path.insert(0, str(Path(__file__).parent / 'src' / 'viz'))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src" / "viz"))
 from train import load_and_prep_data, cat_cols
 
 def main():
